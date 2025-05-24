@@ -9,19 +9,23 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        border: "var(--border)",
         primary: "var(--primary)",
         cta: "var(--cta)",
         "cta-gold": "var(--cta-gold)",
         background: "var(--background)",
         foreground: "var(--foreground)",
-        // ...other colors
+        ring: "var(--ring)",
       },
-      backgroundColor: {
-        background: "var(--background)",
+      borderRadius: {
+        '4xl': '2rem',
       },
-      // ...existing code...
+      screens: {
+        'min-lg': '1024px',
+        'min-md': '768px',
+        'min-2xl': '1536px',
+      },
     },
-    // ...existing code...
   },
   plugins: [],
 }
