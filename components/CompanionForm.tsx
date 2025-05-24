@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/select"
 import { subjects } from "@/constants"
 import { Textarea } from "./ui/textarea"
+import { createCompanion } from "@/lib/actions/companion.actions"
+import { redirect } from "next/navigation"
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Companion is required" }),
@@ -46,8 +48,15 @@ const CompanionForm = () => {
     },
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const companion = await createCompanion(values)
+
+    if (companion) {
+      redirect(`/companions/${companion.$id}`)
+    } else {
+      console.error("Failed to create companion")
+      redirect("/")
+    }
   }
 
   const selectTriggerClass =
@@ -57,7 +66,7 @@ const CompanionForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 w-full px-4"
+        className="space-y-8 max-w-3xl mx-auto w-full px-4"
       >
         <FormField
           control={form.control}
@@ -66,13 +75,9 @@ const CompanionForm = () => {
             <FormItem>
               <FormLabel>Companion Name</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Enter the Companion Name"
-                  {...field}
-                  className="focus-visible:ring-0"
-                />
+                <Input placeholder="Enter the Companion Name" {...field} />
               </FormControl>
-              <FormMessage className="text-red-500 text-sm" />
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -105,7 +110,7 @@ const CompanionForm = () => {
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage className="text-red-500 text-sm" />
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -119,7 +124,7 @@ const CompanionForm = () => {
               <FormControl>
                 <Textarea placeholder="Ex. Algebra" {...field} />
               </FormControl>
-              <FormMessage className="text-red-500 text-sm" />
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -145,7 +150,7 @@ const CompanionForm = () => {
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage className="text-red-500 text-sm" />
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -171,7 +176,7 @@ const CompanionForm = () => {
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage className="text-red-500 text-sm" />
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -190,7 +195,7 @@ const CompanionForm = () => {
                   className="border border-input rounded-md px-3 py-2"
                 />
               </FormControl>
-              <FormMessage className="text-red-500 text-sm" />
+              <FormMessage />
             </FormItem>
           )}
         />
