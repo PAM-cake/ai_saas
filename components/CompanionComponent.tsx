@@ -1,6 +1,6 @@
 "use client"
 
-import { cn, getSubjectColor } from '@/lib/utils'
+import { cn, configureAssistant, getSubjectColor } from '@/lib/utils'
 import { vapi } from '@/lib/vapi.sdk'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
@@ -63,13 +63,22 @@ const CompanionComponent = ({companionId,subject,topic,name,userName,userImage,s
         vapi.setMuted((!isMuted))
         setIsMuted(!isMuted)
     }
+ const handleCall = async () => {
+        setCallStatus(CallStatus.CONNECTING)
 
-    const handleCall = async () => {
+        const assistantOverrides = {
+            variableValues: { subject, topic, style },
+            clientMessages: ["transcript"],
+            serverMessages: [],
+        }
 
+        // @ts-expect-error
+        vapi.start(configureAssistant(voice, style), assistantOverrides)
     }
 
-    const handleDisconnet = async () => {
-        
+    const handleDisconnect = () => {
+        setCallStatus(CallStatus.FINISHED)
+        vapi.stop()
     }
 
   return (
@@ -123,13 +132,12 @@ const CompanionComponent = ({companionId,subject,topic,name,userName,userImage,s
                         {isMuted ? 'Turn on the mic': "Turn of the mic"}
                     </p> 
                 </button>
-                <button className={cn("rounded-lg py-2 transition-colors w-full text-white", callStatus === CallStatus.ACTIVE ? 'bg-red-700' : "bg-primary", callStatus === CallStatus.CONNECTING && 'animate-pulse')} onClick={callStatus === CallStatus.ACTIVE ? handleDisconnet : handleCall}>
+                <button className={cn("rounded-lg py-2 transition-colors w-full text-white", callStatus === CallStatus.ACTIVE ? 'bg-red-700' : "bg-primary", callStatus === CallStatus.CONNECTING && 'animate-pulse')} onClick={callStatus === CallStatus.ACTIVE ? handleDisconnect : handleCall}>
                     {callStatus === CallStatus.ACTIVE
                     ? "End Session"
                     : callStatus === CallStatus.CONNECTING
                     ? "Connecting"
                     :"Start The Session"
-
                     }
 
                 </button>
