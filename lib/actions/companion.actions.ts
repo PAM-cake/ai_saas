@@ -4,17 +4,25 @@ import { auth } from "@clerk/nextjs/server";
 import { createSupabaseClient } from "../supabase";
 
 export const createCompanion = async (formData: CreateCompanion) => {
-    const {userId: author } = await auth();
-    const supabase = createSupabaseClient();
+    try {
+        const { userId: author } = await auth();
+        if (!author) throw new Error("Unauthorized");
 
-    const { data, error } = await supabase
-    .from("companions")
-    .insert({...formData, author})
-    .select()
+        const supabase = createSupabaseClient();
+        const { data, error } = await supabase
+            .from("companions")
+            .insert({ ...formData, author })
+            .select()
+            .single();
 
-    if (error || !data) 
-        throw new Error(error.message);
-    return data[0];
+        if (error) throw new Error(error.message);
+        if (!data) throw new Error("Failed to create companion");
+        
+        return data;
+    } catch (error) {
+        console.error("Error in createCompanion:", error);
+        throw error;
+    }
 }
 
 export const getAllCompanions = async ({limit = 10 , page = 1, subject, topic}: GetAllCompanions) => {
@@ -48,26 +56,18 @@ export const getAllCompanions = async ({limit = 10 , page = 1, subject, topic}: 
 export const getCompanion = async (id: string) => {
     try {
         const supabase = createSupabaseClient();
-
         const { data, error } = await supabase
             .from("companions")
             .select()
             .eq("id", id)
             .single();
 
-        if (error) {
-            console.error('Error fetching companion:', error);
-            return null;
-        }
-        
-        if (!data) {
-            console.error('No companion found with id:', id);
-            return null;
-        }
+        if (error) throw new Error(error.message);
+        if (!data) throw new Error(`No companion found with id: ${id}`);
 
         return data;
     } catch (error) {
-        console.error('Error in getCompanion:', error);
+        console.error("Error in getCompanion:", error);
         return null;
     }
 }
