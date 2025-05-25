@@ -6,63 +6,58 @@ import Image from "next/image";
 import CompanionComponent from "@/components/CompanionComponent";
 
 interface CompanionSessionPageProps {
-  params: { id: string };
+  params: {
+    id: string;
+  };
 }
 
 const CompanionSession = async ({ params }: CompanionSessionPageProps) => {
-  const { id } = params;
-  
-  // Use Promise.all for concurrent requests
-  const companion = await getCompanion(id);
   const user = await currentUser();
-  // Handle authentication first
-  const {name,subject,title,topic,duration} = companion
+  if (!user) redirect("/sign-in");
 
-  if (!user) {
-    redirect('/sign-in');
-  }
-
-  // Then handle companion existence
-  if (!name) {
-    redirect('/companions');
-  }
+  const companion = await getCompanion(params.id);
+  if (!companion) redirect("/");
 
   return (
     <main>
       <article className="flex rounded-border justify-between p-6 max-md:flex-col">
-          <div className="flex items-center gap-2">
-            <div className="size-[72px] flex items-center justify-center rounded-lg max-md:hidden" style={{ backgroundColor: getSubjectColor(subject) }}>
-              <Image 
-                src={`/icons/${subject.toLowerCase()}.svg`}
-                alt={subject}
-                width={35}
-                height={35}
-                priority
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <p className="font-bold text-2xl">
-                  {name}
-                </p>
-                <div className="subject-badge max-sm:hidden">
-                  {subject}
-                </div>
-              </div>
-              <p className="text-lg">
-                {topic}
+        <div className="flex items-center gap-2">
+          <div className="size-[72px] flex items-center justify-center rounded-lg max-md:hidden" style={{ backgroundColor: getSubjectColor(companion.subject) }}>
+            <Image 
+              src={`/icons/${companion.subject.toLowerCase()}.svg`}
+              alt={companion.subject}
+              width={35}
+              height={35}
+              priority
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <p className="font-bold text-2xl">
+                {companion.name}
               </p>
+              <div className="subject-badge max-sm:hidden">
+                {companion.subject}
+              </div>
             </div>
+            <p className="text-lg">
+              {companion.topic}
+            </p>
           </div>
-          <div className="items-start text-2xl max-md:hidden">
-            {duration} minutes
-          </div>
+        </div>
+        <div className="items-start text-2xl max-md:hidden">
+          {companion.duration} minutes
+        </div>
       </article>
       <CompanionComponent
-        {...companion}
-        companionId={id}
-        userName={user.firstName!}
-        userImage={user.imageUrl!}
+        companionId={companion.id}
+        subject={companion.subject}
+        topic={companion.topic}
+        name={companion.name}
+        userName={user.firstName || "User"}
+        userImage={user.imageUrl || "/default-avatar.png"}
+        style={companion.style}
+        voice={companion.voice}
       />
     </main>
   );
