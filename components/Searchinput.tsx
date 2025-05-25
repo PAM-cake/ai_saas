@@ -15,24 +15,21 @@ const Searchinput = () => {
 
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
-        if (search) {
-            const newUrl = formUrlQuery({
-                params: toString(),
-                key : "topic",
-                value: search
-            })
-            router.push(newUrl,{scroll: false});
-        }
-        else {
-            if(pathname === "/companions") {
+            if (search) {
+                const newUrl = formUrlQuery({
+                    params: searchParams.toString(),
+                    key: "topic",
+                    value: search
+                });
+                router.push(newUrl, { scroll: false });
+            } else if (pathname === "/companions") {
                 const newUrl = removeKeysFromUrlQuery({
-                    params: toString(),
+                    params: searchParams.toString(),
                     keysToRemove: ["topic"]
-                })
-                router.push(newUrl,{scroll: false});
+                });
+                router.push(newUrl, { scroll: false });
             }
-        }
-        })
+        }, 300);
 
     },[search, router, searchParams, pathname])
 

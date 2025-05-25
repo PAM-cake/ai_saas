@@ -20,21 +20,26 @@ const SubjectFilter = () => {
     const [subject, setSubject] = useState(query);
 
     useEffect(() => {
-        let newUrl = "";
-        if (subject === "all") {
-            newUrl = removeKeysFromUrlQuery({
-                params: searchParams.toString(),
-                keysToRemove: ["subject"],
-            });
-        } else {
-            newUrl = formUrlQuery({
-                params: searchParams.toString(),
-                key: "subject",
-                value: subject,
-            });
-        }
-        router.push(newUrl, { scroll: false });
-    }, [subject]);
+        const updateUrl = () => {
+            let newUrl = "";
+            if (subject === "all") {
+                newUrl = removeKeysFromUrlQuery({
+                    params: searchParams.toString(),
+                    keysToRemove: ["subject"],
+                });
+            } else if (subject) {
+                newUrl = formUrlQuery({
+                    params: searchParams.toString(),
+                    key: "subject",
+                    value: subject,
+                });
+            }
+            router.push(newUrl, { scroll: false });
+        };
+
+        const timeoutId = setTimeout(updateUrl, 100);
+        return () => clearTimeout(timeoutId);
+    }, [subject, searchParams, router]);
 
     return (
         <Select onValueChange={setSubject} value={subject}>

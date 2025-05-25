@@ -30,10 +30,12 @@ const CompanionCard = ({id, name, topic, subject, duration, color}:
               {duration} minutes
             </p>
         </div>
-        <Link href={`/companions/${id}`} className="w-full">
-            <button className="btn-primary w-full justify-center">
-                Start Learning
-            </button>
+        <Link 
+            href={`/companions/${id}`} 
+            className="btn-primary w-full justify-center transition-all hover:opacity-90 block text-center py-2"
+            prefetch={true}
+        >
+            Start Learning
         </Link>
     </article>
   )
