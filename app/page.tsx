@@ -22,9 +22,6 @@ const Page = async () => {
           color={getSubjectColor(companion.subject)}
         />
         ))}
-
-
-
       </section>
       <section className="home-section mt-8">
         <CompanionList 
