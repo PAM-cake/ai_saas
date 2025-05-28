@@ -1,23 +1,37 @@
 import CompanionCard from "@/components/CompanionCard";
 import Searchinput from "@/components/Searchinput";
 import SubjectFilter from "@/components/SubjectFilter";
-import { getAllCompanions } from "@/lib/actions/companion.actions";
+import { getUserCompanions } from "@/lib/actions/companion.actions";
 import { getSubjectColor } from "@/lib/utils";
+import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const CompanionsLibrary = async ({searchParams}: SearchParams) => {
+  const user = await currentUser();
+  if (!user) redirect("/sign-in");
+
   try {
     const filters = await searchParams;
     const subject = filters.subject || "";
     const topic = filters.topic || "";
     
-    const companions = await getAllCompanions({ subject, topic });
+    const companions = await getUserCompanions(user.id);
+    
+    // Filter companions based on search params
+    const filteredCompanions = companions.filter(companion => {
+      const matchesSubject = !subject || companion.subject.toLowerCase().includes(subject.toLowerCase());
+      const matchesTopic = !topic || 
+        companion.topic.toLowerCase().includes(topic.toLowerCase()) || 
+        companion.name.toLowerCase().includes(topic.toLowerCase());
+      return matchesSubject && matchesTopic;
+    });
 
     return (
       <main className="min-h-screen p-8">
         <section className="flex justify-between gap-4 max-sm:flex-col mb-8">
             <h1 className="text-2xl font-bold">
-              Companion Library
+              My Companions
             </h1>
             <div className="flex gap-4">
               <Searchinput/>
@@ -25,8 +39,8 @@ const CompanionsLibrary = async ({searchParams}: SearchParams) => {
             </div>
         </section>
         <section className="companions-grid">
-          {companions && companions.length > 0 ? (
-            companions.map((companion) => (
+          {filteredCompanions && filteredCompanions.length > 0 ? (
+            filteredCompanions.map((companion) => (
               <CompanionCard 
                 key={companion.id} 
                 {...companion}
@@ -48,16 +62,16 @@ const CompanionsLibrary = async ({searchParams}: SearchParams) => {
       </main>
     );
   } catch (error) {
-    console.error('Error in CompanionsLibrary:', error);
+    console.error("Error in CompanionsLibrary:", error);
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="text-lg mb-4">Something went wrong</p>
-        <Link href="/" className="btn-primary">
-          Go Back Home
-        </Link>
-      </div>
+      <main className="min-h-screen p-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Error Loading Companions</h1>
+          <p>Please try again later</p>
+        </div>
+      </main>
     );
   }
 }
 
-export default CompanionsLibrary
+export default CompanionsLibrary;

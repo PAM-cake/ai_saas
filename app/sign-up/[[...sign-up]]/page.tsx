@@ -1,11 +1,11 @@
-import { SignIn } from '@clerk/nextjs';
+import { SignUp } from '@clerk/nextjs';
 
 export default function Page() {
     return (
         <main className='flex items-center justify-center min-h-screen'>
-            <SignIn 
-                afterSignInUrl="/"
-                signUpUrl="/sign-up"
+            <SignUp 
+                afterSignUpUrl="/"
+                signInUrl="/sign-in"
                 appearance={{
                     elements: {
                         formButtonPrimary: {
@@ -19,4 +19,4 @@ export default function Page() {
             />
         </main>
     );
-}
+} 

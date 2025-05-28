@@ -1,9 +1,11 @@
-import { getCompanion } from "@/lib/actions/companion.actions";
+import { getCompanion, deleteCompanion } from "@/lib/actions/companion.actions";
 import { getSubjectColor } from "@/lib/utils";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import CompanionComponent from "@/components/CompanionComponent";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 interface CompanionSessionPageProps {
   params: {
@@ -17,6 +19,11 @@ const CompanionSession = async ({ params }: CompanionSessionPageProps) => {
 
   const companion = await getCompanion(params.id);
   if (!companion) redirect("/");
+  
+  // Check if the user owns this companion
+  if (companion.author !== user.id) {
+    redirect("/");
+  }
 
   return (
     <main>
@@ -45,8 +52,19 @@ const CompanionSession = async ({ params }: CompanionSessionPageProps) => {
             </p>
           </div>
         </div>
-        <div className="items-start text-2xl max-md:hidden">
-          {companion.duration} minutes
+        <div className="flex items-center gap-4">
+          <div className="items-start text-2xl max-md:hidden">
+            {companion.duration} minutes
+          </div>
+          <form action={async () => {
+            'use server'
+            await deleteCompanion(companion.id);
+            redirect('/my-journey');
+          }}>
+            <Button variant="destructive" size="icon">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </form>
         </div>
       </article>
       <CompanionComponent

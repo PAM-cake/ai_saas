@@ -2,6 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseClient } from "../supabase";
+import { Companion, CreateCompanion, GetAllCompanions } from "@/types";
 
 export const createCompanion = async (formData: CreateCompanion) => {
     try {
@@ -86,16 +87,27 @@ export const addToSessionHistory = async(companionId:string)=>{
 }
 
 export const getRecentSessions = async(limit=10)=>{
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
     const supabase = createSupabaseClient()
     const {data,error} = await supabase
         .from('session_history')
         .select(`companions:companion_id (*)`)
+        .eq('user_id', userId)
         .order('created_at', {ascending:false})
         .limit(limit)
 
         if(error) throw new Error(error.message)
 
-        return data.map(({companions}) => companions)
+        // Use Map to deduplicate companions by ID
+        const uniqueCompanions = new Map<string, Companion>();
+        data.forEach(({companions}: {companions: Companion}) => {
+            if (!uniqueCompanions.has(companions.id)) {
+                uniqueCompanions.set(companions.id, companions);
+            }
+        });
+        return Array.from(uniqueCompanions.values());
 }
 
 export const getUserSessions = async(userId:string, limit=10)=>{
@@ -109,7 +121,14 @@ export const getUserSessions = async(userId:string, limit=10)=>{
 
         if(error) throw new Error(error.message)
 
-        return data.map(({companions}) => companions)
+        // Use Map to deduplicate companions by ID
+        const uniqueCompanions = new Map<string, Companion>();
+        data.forEach(({companions}: {companions: Companion}) => {
+            if (!uniqueCompanions.has(companions.id)) {
+                uniqueCompanions.set(companions.id, companions);
+            }
+        });
+        return Array.from(uniqueCompanions.values());
 }
 
 export const getUserCompanions = async(userId:string)=>{
@@ -153,5 +172,38 @@ export const newCompanionPermissions = async () => {
         return false
     } else {
         return true;
+    }
+}
+
+export const deleteCompanion = async (id: string) => {
+    try {
+        const { userId } = await auth();
+        if (!userId) throw new Error("Unauthorized");
+
+        const supabase = createSupabaseClient();
+        
+        // First verify the companion belongs to the user
+        const { data: companion, error: fetchError } = await supabase
+            .from("companions")
+            .select("author")
+            .eq("id", id)
+            .single();
+
+        if (fetchError) throw new Error(fetchError.message);
+        if (!companion) throw new Error("Companion not found");
+        if (companion.author !== userId) throw new Error("Unauthorized");
+
+        // Delete the companion
+        const { error: deleteError } = await supabase
+            .from("companions")
+            .delete()
+            .eq("id", id);
+
+        if (deleteError) throw new Error(deleteError.message);
+        
+        return true;
+    } catch (error) {
+        console.error("Error in deleteCompanion:", error);
+        throw error;
     }
 }
