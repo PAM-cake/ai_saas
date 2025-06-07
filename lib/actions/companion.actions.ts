@@ -4,6 +4,11 @@ import { auth } from "@clerk/nextjs/server";
 import { createSupabaseClient } from "../supabase";
 import { Companion, CreateCompanion, GetAllCompanions } from "@/types";
 
+/**
+ * Creates a new companion in the database
+ * @param formData - The companion data to create
+ * @returns The created companion object
+ */
 export const createCompanion = async (formData: CreateCompanion) => {
     try {
         const { userId: author } = await auth();
@@ -26,20 +31,28 @@ export const createCompanion = async (formData: CreateCompanion) => {
     }
 }
 
+/**
+ * Retrieves a paginated list of companions with optional filtering
+ * @param params - Query parameters including limit, page, subject, and topic
+ * @returns Array of matching companions
+ */
 export const getAllCompanions = async ({limit = 10 , page = 1, subject, topic}: GetAllCompanions) => {
     try {
         const supabase = createSupabaseClient();
         
         let query = supabase.from("companions").select();
         
+        // Apply subject filter if specified
         if (subject && subject !== 'all') {
             query = query.ilike("subject", `%${subject}%`);
         }
         
+        // Apply topic filter if specified
         if (topic) {
             query = query.or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`);
         }
 
+        // Apply pagination and sorting
         query = query.order('created_at', { ascending: false })
                     .range((page - 1) * limit, page * limit - 1);
         
@@ -53,7 +66,11 @@ export const getAllCompanions = async ({limit = 10 , page = 1, subject, topic}: 
     }
 }
 
-
+/**
+ * Retrieves a single companion by ID
+ * @param id - The companion ID to fetch
+ * @returns The companion object or null if not found
+ */
 export const getCompanion = async (id: string) => {
     try {
         const supabase = createSupabaseClient();
@@ -73,6 +90,11 @@ export const getCompanion = async (id: string) => {
     }
 }
 
+/**
+ * Records a new session in the session history
+ * @param companionId - The ID of the companion used in the session
+ * @returns The created session record
+ */
 export const addToSessionHistory = async(companionId:string)=>{
     const {userId} = await auth()
     const supabase = createSupabaseClient()
@@ -86,6 +108,11 @@ export const addToSessionHistory = async(companionId:string)=>{
     return data
 }
 
+/**
+ * Retrieves recent sessions for the current user
+ * @param limit - Maximum number of sessions to return
+ * @returns Array of unique companions from recent sessions
+ */
 export const getRecentSessions = async(limit=10)=>{
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -100,7 +127,7 @@ export const getRecentSessions = async(limit=10)=>{
 
         if(error) throw new Error(error.message)
 
-        // Use Map to deduplicate companions by ID
+        // Deduplicate companions using a Map
         const uniqueCompanions = new Map<string, Companion>();
         data.forEach(({companions}: {companions: Companion}) => {
             if (!uniqueCompanions.has(companions.id)) {
@@ -110,6 +137,12 @@ export const getRecentSessions = async(limit=10)=>{
         return Array.from(uniqueCompanions.values());
 }
 
+/**
+ * Retrieves sessions for a specific user
+ * @param userId - The user ID to fetch sessions for
+ * @param limit - Maximum number of sessions to return
+ * @returns Array of unique companions from user's sessions
+ */
 export const getUserSessions = async(userId:string, limit=10)=>{
     const supabase = createSupabaseClient()
     const {data,error} = await supabase
@@ -121,7 +154,7 @@ export const getUserSessions = async(userId:string, limit=10)=>{
 
         if(error) throw new Error(error.message)
 
-        // Use Map to deduplicate companions by ID
+        // Deduplicate companions using a Map
         const uniqueCompanions = new Map<string, Companion>();
         data.forEach(({companions}: {companions: Companion}) => {
             if (!uniqueCompanions.has(companions.id)) {
@@ -131,6 +164,11 @@ export const getUserSessions = async(userId:string, limit=10)=>{
         return Array.from(uniqueCompanions.values());
 }
 
+/**
+ * Retrieves all companions created by a specific user
+ * @param userId - The user ID to fetch companions for
+ * @returns Array of companions created by the user
+ */
 export const getUserCompanions = async(userId:string)=>{
     const supabase = createSupabaseClient()
     const {data,error} = await supabase
@@ -144,13 +182,17 @@ export const getUserCompanions = async(userId:string)=>{
         return data || []
 }
 
-
+/**
+ * Checks if a user can create a new companion based on their subscription plan
+ * @returns Boolean indicating if user can create a new companion
+ */
 export const newCompanionPermissions = async () => {
     const { userId, has } = await auth();
     const supabase = createSupabaseClient();
 
     let limit = 0;
 
+    // Set companion limit based on subscription plan
     if(has({ plan: 'pro' })) {
         return true;
     } else if(has({ feature: "3_companion_limit" })) {
@@ -159,6 +201,7 @@ export const newCompanionPermissions = async () => {
         limit = 10;
     } 
 
+    // Check current companion count
     const { data, error } = await supabase
         .from('companions')
         .select('id', { count: 'exact' })
@@ -168,13 +211,14 @@ export const newCompanionPermissions = async () => {
 
     const companionCount = data?.length;
 
-    if(companionCount >= limit) {
-        return false
-    } else {
-        return true;
-    }
+    return companionCount < limit;
 }
 
+/**
+ * Deletes a companion after verifying ownership
+ * @param id - The ID of the companion to delete
+ * @returns Boolean indicating success
+ */
 export const deleteCompanion = async (id: string) => {
     try {
         const { userId } = await auth();
@@ -182,7 +226,7 @@ export const deleteCompanion = async (id: string) => {
 
         const supabase = createSupabaseClient();
         
-        // First verify the companion belongs to the user
+        // Verify companion ownership
         const { data: companion, error: fetchError } = await supabase
             .from("companions")
             .select("author")

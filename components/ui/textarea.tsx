@@ -1,7 +1,19 @@
+/**
+ * Textarea Component
+ * A customizable textarea input component
+ * Provides consistent styling and accessibility features
+ */
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Textarea component with customizable styling
+ * @param props - HTML textarea attributes
+ * @param ref - Forwarded ref for the textarea element
+ * @returns A styled textarea input
+ */
 const Textarea = React.forwardRef<
   HTMLTextAreaElement,
   React.ComponentProps<"textarea">

@@ -1,3 +1,9 @@
+/**
+ * Companion Form Component
+ * A form for creating new learning companions with validation
+ * Handles form submission and companion creation
+ */
+
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,6 +32,10 @@ import { subjects } from "@/constants"
 import { Textarea } from "./ui/textarea"
 import { createCompanion } from "@/lib/actions/companion.actions"
 
+/**
+ * Form validation schema using Zod
+ * Defines required fields and validation rules for companion creation
+ */
 const formSchema = z.object({
   name: z.string().min(2, { message: "Companion is required" }),
   subject: z.string().min(2, { message: "Subject is required" }),
@@ -35,9 +45,15 @@ const formSchema = z.object({
   duration: z.coerce.number().min(1, { message: "Duration is required" }),
 })
 
+/**
+ * Companion Form component for creating new learning companions
+ * Uses React Hook Form with Zod validation
+ * @returns A form component with fields for companion creation
+ */
 const CompanionForm = () => {
   const router = useRouter()
 
+  // Initialize form with validation and default values
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,6 +66,11 @@ const CompanionForm = () => {
     },
   })
 
+  /**
+   * Handles form submission
+   * Creates a new companion and redirects to companions page on success
+   * @param values - Form values validated against the schema
+   */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const companion = await createCompanion(values)
@@ -61,6 +82,7 @@ const CompanionForm = () => {
     }
   }
 
+  // Common class for select triggers
   const selectTriggerClass =
     "border border-input rounded-md px-3 py-2 capitalize"
 
@@ -70,6 +92,7 @@ const CompanionForm = () => {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 max-w-3xl mx-auto w-full px-4"
       >
+        {/* Companion Name Field */}
         <FormField
           control={form.control}
           name="name"
@@ -84,6 +107,7 @@ const CompanionForm = () => {
           )}
         />
 
+        {/* Subject Selection Field */}
         <FormField
           control={form.control}
           name="subject"
@@ -117,6 +141,7 @@ const CompanionForm = () => {
           )}
         />
 
+        {/* Topic Description Field */}
         <FormField
           control={form.control}
           name="topic"
@@ -131,6 +156,7 @@ const CompanionForm = () => {
           )}
         />
 
+        {/* Voice Selection Field */}
         <FormField
           control={form.control}
           name="voice"
@@ -157,6 +183,7 @@ const CompanionForm = () => {
           )}
         />
 
+        {/* Style Selection Field */}
         <FormField
           control={form.control}
           name="style"
@@ -183,6 +210,7 @@ const CompanionForm = () => {
           )}
         />
 
+        {/* Duration Input Field */}
         <FormField
           control={form.control}
           name="duration"
@@ -202,6 +230,7 @@ const CompanionForm = () => {
           )}
         />
 
+        {/* Submit Button */}
         <Button
           type="submit"
           className="w-full cursor-pointer bg-black text-white"

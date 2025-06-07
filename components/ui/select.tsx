@@ -1,3 +1,9 @@
+/**
+ * Select Components
+ * A collection of select/dropdown components using Radix UI
+ * Provides accessible and customizable select inputs with animations
+ */
+
 "use client"
 
 import * as React from "react"
@@ -6,12 +12,21 @@ import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+// Root select component
 const Select = SelectPrimitive.Root
 
+// Group component for organizing select options
 const SelectGroup = SelectPrimitive.Group
 
+// Value component for displaying the selected value
 const SelectValue = SelectPrimitive.Value
 
+/**
+ * Select trigger component that opens the select menu
+ * Includes a chevron icon and placeholder text
+ * @param props - Select trigger props from Radix UI
+ * @param ref - Forwarded ref for the trigger button
+ */
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
@@ -32,6 +47,11 @@ const SelectTrigger = React.forwardRef<
 ))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
+/**
+ * Scroll up button for the select content
+ * @param props - Scroll button props from Radix UI
+ * @param ref - Forwarded ref for the scroll button
+ */
 const SelectScrollUpButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
@@ -49,6 +69,11 @@ const SelectScrollUpButton = React.forwardRef<
 ))
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
 
+/**
+ * Scroll down button for the select content
+ * @param props - Scroll button props from Radix UI
+ * @param ref - Forwarded ref for the scroll button
+ */
 const SelectScrollDownButton = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
@@ -67,6 +92,12 @@ const SelectScrollDownButton = React.forwardRef<
 SelectScrollDownButton.displayName =
   SelectPrimitive.ScrollDownButton.displayName
 
+/**
+ * Select content component that contains the dropdown menu
+ * Includes animations and positioning options
+ * @param props - Select content props from Radix UI
+ * @param ref - Forwarded ref for the content container
+ */
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
@@ -99,6 +130,11 @@ const SelectContent = React.forwardRef<
 ))
 SelectContent.displayName = SelectPrimitive.Content.displayName
 
+/**
+ * Select label component for grouping options
+ * @param props - Select label props from Radix UI
+ * @param ref - Forwarded ref for the label element
+ */
 const SelectLabel = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
@@ -111,6 +147,12 @@ const SelectLabel = React.forwardRef<
 ))
 SelectLabel.displayName = SelectPrimitive.Label.displayName
 
+/**
+ * Select item component for individual options
+ * Includes a check icon for the selected state
+ * @param props - Select item props from Radix UI
+ * @param ref - Forwarded ref for the item element
+ */
 const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
@@ -133,6 +175,11 @@ const SelectItem = React.forwardRef<
 ))
 SelectItem.displayName = SelectPrimitive.Item.displayName
 
+/**
+ * Select separator component for visually separating options
+ * @param props - Select separator props from Radix UI
+ * @param ref - Forwarded ref for the separator element
+ */
 const SelectSeparator = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>

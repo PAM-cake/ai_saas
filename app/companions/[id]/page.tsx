@@ -20,7 +20,6 @@ const CompanionSession = async ({ params }: CompanionSessionPageProps) => {
   const companion = await getCompanion(params.id);
   if (!companion) redirect("/");
   
-  // Check if the user owns this companion
   if (companion.author !== user.id) {
     redirect("/");
   }

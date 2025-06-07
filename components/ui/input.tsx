@@ -1,7 +1,20 @@
+/**
+ * Input Component
+ * A customizable text input component
+ * Provides consistent styling and accessibility features
+ */
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Input component with customizable styling
+ * Supports various input types and file inputs
+ * @param props - HTML input attributes
+ * @param ref - Forwarded ref for the input element
+ * @returns A styled input element
+ */
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
     return (

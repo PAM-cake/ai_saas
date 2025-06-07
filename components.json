@@ -1,21 +1,28 @@
 {
+  // Schema for shadcn/ui components
   "$schema": "https://ui.shadcn.com/schema.json",
+  // Use New York style variant
   "style": "new-york",
+  // Enable React Server Components
   "rsc": true,
+  // Use TypeScript with JSX
   "tsx": true,
+  // Tailwind CSS configuration
   "tailwind": {
-    "config": "tailwind.config.ts",
-    "css": "app/globals.css",
-    "baseColor": "neutral",
-    "cssVariables": true,
-    "prefix": ""
+    "config": "tailwind.config.ts",    // Tailwind config file path
+    "css": "app/globals.css",          // Global CSS file path
+    "baseColor": "neutral",            // Base color scheme
+    "cssVariables": true,              // Use CSS variables for theming
+    "prefix": ""                       // No prefix for utility classes
   },
+  // Path aliases for imports
   "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "components": "@/components",      // UI components directory
+    "utils": "@/lib/utils",            // Utility functions
+    "ui": "@/components/ui",           // UI component library
+    "lib": "@/lib",                    // Library code
+    "hooks": "@/hooks"                 // React hooks
   },
-  "iconLibrary": "lucide"
+  // Icon library to use
+  "iconLibrary": "lucide"              // Lucide icon set
 }

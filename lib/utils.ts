@@ -3,19 +3,37 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { CreateAssistantDTO } from "@vapi-ai/web/dist/api";
 
+/**
+ * Utility function to merge Tailwind CSS classes with proper precedence
+ * @param inputs - Class values to be merged
+ * @returns Merged class string
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/**
+ * Gets the color associated with a subject
+ * @param subject - The subject to get the color for
+ * @returns The hex color code for the subject
+ */
 export const getSubjectColor = (subject: string): string => {
   return subjectsColors[subject as keyof typeof subjectsColors]
 } // Default color if subject not found
 
+/**
+ * Configures an AI assistant with specific voice and style settings
+ * @param voice - The voice type to use
+ * @param style - The conversation style to use
+ * @returns Configured assistant DTO for the VAPI AI service
+ */
 export const configureAssistant = (voice: string, style: string) => {
+  // Get the appropriate voice ID based on voice and style
   const voiceId = voices[voice as keyof typeof voices][
           style as keyof (typeof voices)[keyof typeof voices]
           ] || "sarah";
 
+  // Configure the VAPI assistant with specific settings
   const vapiAssistant: CreateAssistantDTO = {
     name: "Companion",
     firstMessage:
